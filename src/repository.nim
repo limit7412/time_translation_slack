@@ -1,19 +1,11 @@
 import httpClient
 import json
+import models
 
 type
   SlackRepository* = ref object
     url*: string
 
-type
-  Post* = ref object
-    fallback*: string
-    pretext*: string
-    title*: string
-    text*: string
-    color*: string
-    footer*: string
-type
   payload = ref object
     attachments: seq[Post]
 

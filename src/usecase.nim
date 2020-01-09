@@ -1,12 +1,13 @@
 import os
+import models
 import repository
 
 type
   TimeUsecase* = ref object
 
-proc translation*(self: TimeUsecase): Post =
+proc translation*(self: TimeUsecase, time: string): Post =
   return Post(
-      text: "test"
+      text: $time
     )
 
 proc err*(self: TimeUsecase, err: ref Exception) =
