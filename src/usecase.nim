@@ -1,5 +1,6 @@
 import os
 import strutils
+import times
 
 import models
 import repository
@@ -7,22 +8,38 @@ import repository
 type
   TimeUsecase* = ref object
 
-proc translation*(self: TimeUsecase, time: string): Post =
-  var isUnixtime: bool
-  try:
-    discard time.parseInt
-    isUnixtime = true
-  except:
-    isUnixtime = false
+proc translationUnixtime(self: TimeUsecase, time: int): Post =
+  let
+    date = time.fromUnix
+    jstdate = date + 9.hours
+    utc = date.format("yyyy-MM-dd HH:mm:ss")
+    jst = jstdate.format("yyyy-MM-dd HH:mm:ss")
 
-  if isUnixtime:
-    return Post(
-        text: "unixtime"
-      )
-  else:
-    return Post(
-        text: "string"
-      )
+  return Post(
+    pretext:
+    "unixtimeの `" & time.intToStr &
+    "` は日本時間では `" & date.format("yyyy/MM/dd HH:mm:ss") &
+    "` だよ。",
+    text:
+    "JST: " & jst & "\n" &
+    "UTC: " & utc,
+    color: "#3f93f2",
+  )
+
+proc translation*(self: TimeUsecase, time: string): Payload =
+  let isUnixtime =
+    try:
+      discard time.parseInt
+      true
+    except:
+      false
+
+  let body =
+    if isUnixtime:
+      self.translationUnixtime(time.parseInt)
+    else:
+      Post(text: "string")
+  return Payload(attachments: @[body])
 
 proc err*(self: TimeUsecase, err: ref Exception) =
   let repo = SlackRepository(url: os.getEnv("ALERT_WEBHOOK_URL").string)
@@ -32,5 +49,5 @@ proc err*(self: TimeUsecase, err: ref Exception) =
       pretext: "<@" & os.getEnv("SLACK_ID").string & "> " & message,
       title: err.msg,
       color: "#EB4646",
-      footer: "slack-izumi-suki-bot",
+      footer: "slack-time-translation",
     )])

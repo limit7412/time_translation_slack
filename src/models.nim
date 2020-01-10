@@ -6,3 +6,6 @@ type
     text*: string
     color*: string
     footer*: string
+
+  Payload* = ref object
+    attachments*: seq[Post]
