@@ -1,5 +1,5 @@
 type
-  Post* = ref object
+  SlackPost* = ref object
     fallback*: string
     pretext*: string
     title*: string
@@ -7,5 +7,5 @@ type
     color*: string
     footer*: string
 
-  Payload* = ref object
-    attachments*: seq[Post]
+  SlackPayload* = ref object
+    attachments*: seq[SlackPost]
