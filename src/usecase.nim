@@ -8,14 +8,14 @@ import repository
 type
   TimeUsecase* = ref object
 
-proc translationUnixtime(self: TimeUsecase, time: int): SlackPost =
+proc translationUnixtime(self: TimeUsecase, time: int): SlackPayload =
   let
     date = time.fromUnix
     jstdate = date + 9.hours
     utc = date.format("yyyy-MM-dd HH:mm:ss")
     jst = jstdate.format("yyyy-MM-dd HH:mm:ss")
 
-  return SlackPost(
+  return SlackPayload(attachments: @[SlackPost(
     pretext:
     "unixtimeの `" & time.intToStr &
     "` は日本時間では `" & date.format("yyyy/MM/dd HH:mm:ss") &
@@ -24,7 +24,7 @@ proc translationUnixtime(self: TimeUsecase, time: int): SlackPost =
     "JST: " & jst & "\n" &
     "UTC: " & utc,
     color: "#3f93f2",
-  )
+  )])
 
 proc translation*(self: TimeUsecase, time: string): SlackPayload =
   let isUnixtime =
@@ -34,12 +34,10 @@ proc translation*(self: TimeUsecase, time: string): SlackPayload =
     except:
       false
 
-  let body =
-    if isUnixtime:
-      self.translationUnixtime(time.parseInt)
-    else:
-      SlackPost(text: "string")
-  return SlackPayload(attachments: @[body])
+  if isUnixtime:
+    self.translationUnixtime(time.parseInt)
+  else:
+    SlackPayload(attachments: @[SlackPost(text: "string")])
 
 proc err*(self: TimeUsecase, err: ref Exception) =
   let repo = SlackRepository(url: os.getEnv("ALERT_WEBHOOK_URL").string)
