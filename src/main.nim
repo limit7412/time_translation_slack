@@ -20,5 +20,5 @@ when isMainModule:
         "body": $ %*res,
       }
     except:
-      uc.err(getCurrentException())
+      uc.err(getCurrentException(), time)
       raise
