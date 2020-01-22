@@ -99,7 +99,7 @@ proc translation*(self: TimeUsecase, time: string): SlackPayload =
           color: "#ffca4f",
         )])
 
-proc err*(self: TimeUsecase, err: ref Exception) =
+proc err*(self: TimeUsecase, err: ref Exception, time: string) =
   let
     repo = SlackRepository(url: os.getEnv("ALERT_WEBHOOK_URL").string)
     message = "エラーみたい…確認してみよっか"
@@ -108,6 +108,7 @@ proc err*(self: TimeUsecase, err: ref Exception) =
       fallback: message,
       pretext: "<@" & os.getEnv("SLACK_ID").string & "> " & message,
       title: err.msg,
+      text: "input: " & time,
       color: "#EB4646",
       footer: "slack-time-translation",
     )])
