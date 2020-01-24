@@ -4,6 +4,7 @@ import times
 
 import models
 import repository
+import hander
 
 type
   TimeUsecase* = ref object
@@ -85,21 +86,33 @@ proc translation*(self: TimeUsecase, time: string): SlackPayload =
   if isUnixtime:
     self.translationUnixtime(time.parseInt)
   else:
-    let datetime = time.split("+")
+    let
+      datetime = time.split("+")
+      date = datetime[0]
+      time = datetime[1].replace("%3A", ":")
+
+    try:
+      discard (date & " " & time).parse("yyyy-MM-dd HH:mm:ss")
+    except:
+      return SlackPayload(attachments: @[SlackPost(
+        pretext: "日時の書式が間違ってるみたい…よく確認してみて。",
+        text: "/time2unix [unixtime|yyyy-MM-dd HH:mm:ss [JST|UTC]]",
+        color: "#ffca4f",
+      )])
+
     case datetime.len
     of 2:
-      self.translationDatetime(datetime[0], datetime[1].replace("%3A", ":"))
+      self.translationDatetime(date, time)
     of 3:
-      self.translationDatetime(datetime[0], datetime[1].replace("%3A", ":"),
-          datetime[2])
+      self.translationDatetime(date, time, datetime[2])
     else:
       SlackPayload(attachments: @[SlackPost(
-          pretext: "日時の書式が間違ってるみたい…よく確認してみて。",
+          pretext: "引数の数が間違ってるみたい…よく確認してみて。",
           text: "/time2unix [unixtime|yyyy-MM-dd HH:mm:ss [JST|UTC]]",
           color: "#ffca4f",
         )])
 
-proc err*(self: TimeUsecase, err: ref Exception, time: string) =
+proc err*(self: TimeUsecase, err: ref Exception, text: string) =
   let
     repo = SlackRepository(url: os.getEnv("ALERT_WEBHOOK_URL").string)
     message = "エラーみたい…確認してみよっか"
@@ -108,7 +121,7 @@ proc err*(self: TimeUsecase, err: ref Exception, time: string) =
       fallback: message,
       pretext: "<@" & os.getEnv("SLACK_ID").string & "> " & message,
       title: err.msg,
-      text: "input: " & time,
+      text: text,
       color: "#EB4646",
       footer: "slack-time-translation",
     )])

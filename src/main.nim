@@ -20,5 +20,16 @@ when isMainModule:
         "body": $ %*res,
       }
     except:
-      uc.err(getCurrentException(), time)
+      var
+        user: string
+        team: string
+      for item in body.split("&"):
+        let tmp = item.split("=")
+        case tmp[0]
+        of "user_name":
+          user = tmp[1]
+        of "team_domain":
+          team = tmp[1]
+      uc.err(getCurrentException(), "input: " & time & "\n" & "user: " & user &
+          "\n" & "team: " & team)
       raise
