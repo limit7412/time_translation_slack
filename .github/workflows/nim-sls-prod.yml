@@ -44,4 +44,4 @@ jobs:
 
     - name: push result
       run: |
-        aws s3 cp ./result.txt s3://limit7412-workflow-env/slack-time-translation/prod/result-dev.txt
+        aws s3 cp ./result.txt s3://limit7412-workflow-env/slack-time-translation/result/result-prod.txt
