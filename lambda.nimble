@@ -11,4 +11,5 @@ backend       = "cpp"
 
 # Dependencies
 
-requires "nim >= 1.0.2"
+# FIXME: change use latest
+requires "nim >= 1.0.6"
