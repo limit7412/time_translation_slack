@@ -1,0 +1,47 @@
+name: nim-sls
+
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    container:
+      image: nimlang/nim
+
+    steps:
+
+    - name: checkout
+      uses: actions/checkout@v1
+
+    - name: build
+      run: nimble build -d:ssl && mv main bootstrap && chmod +x bootstrap
+
+    - name: install aws
+      run: apt-get -y update && apt-get -y install awscli
+
+    - name: configure aws
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-northeast-1
+
+    - name: get env
+      run: |
+        aws s3 cp s3://limit7412-workflow-env/slack-time-translation/dev/env.yml .
+
+    - name: setup node.js
+      uses: actions/setup-node@v1
+
+    - name: install sls
+      run: npm i -g serverless
+
+    - name: deploy
+      run: sls deploy -s dev > ./result.txt
+
+    - name: push result
+      run: |
+        aws s3 cp ./result.txt s3://limit7412-workflow-env/slack-time-translation/result/result-dev.txt
