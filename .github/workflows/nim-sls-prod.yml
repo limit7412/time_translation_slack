@@ -22,6 +22,8 @@ jobs:
 
     - name: install aws
       run: apt-get -y update && apt-get -y install awscli
+      env:
+        DEBIAN_FRONTEND: noninteractive
 
     - name: configure aws
       uses: aws-actions/configure-aws-credentials@v1
