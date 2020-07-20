@@ -16,6 +16,9 @@ jobs:
     - name: checkout
       uses: actions/checkout@v1
 
+    - name: update glibc
+      run: yum update glibc
+
     - name: build
       run: nimble build -d:ssl --passL:-static && mv main bootstrap && chmod +x bootstrap
 
