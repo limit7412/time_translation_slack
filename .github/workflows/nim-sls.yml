@@ -18,7 +18,6 @@ jobs:
 
     - name: build
       run: nimble build -d:ssl && mv main bootstrap && chmod +x bootstrap
-      # run: nimble build -d:ssl --passL:-static -d:release --opt:size && mv main bootstrap && chmod +x bootstrap
 
     - name: install aws
       run: apt-get -y update && apt-get -y install awscli
