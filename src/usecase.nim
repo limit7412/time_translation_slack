@@ -36,7 +36,7 @@ proc translationDatetime(self: TimeUsecase, date, time: string): SlackPayload =
     text:
     "JST: " & datetime.format("yyyy-MM-dd HH:mm:ss") & "\n" &
     "UTC: " & (datetime - 9.hours).format("yyyy-MM-dd HH:mm:ss") & "\n" &
-    "unixtime: " & $(datetime.toUnix),
+    "unixtime: " & $((datetime - 9.hours).toUnix),
     color: "#3f93f2",
   ), SlackPost(
     pretext:
