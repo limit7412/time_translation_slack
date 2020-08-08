@@ -35,7 +35,6 @@ proc parseSlashCommand*(input: string): SlashCommand =
     table = Table[string, string]()
 
   for item in input.split("\"")[1].split("&"):
-    echo item
     let kv = item.split("=")
     table[kv[0]] = kv[1].decodeUrl
 
