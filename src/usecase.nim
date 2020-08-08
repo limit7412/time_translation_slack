@@ -4,76 +4,36 @@ import times
 
 import models
 import repository
-import hander
 
 type
   TimeUsecase* = ref object
 
-proc translationUnixtime(self: TimeUsecase, time: int): SlackPayload =
+proc translationUnixtime(self: TimeUsecase, unixtime: int): SlackPayload =
   let
-    date = time.fromUnix
-    jstdate = date + 9.hours
-    utc = date.format("yyyy-MM-dd HH:mm:ss")
-    jst = jstdate.format("yyyy-MM-dd HH:mm:ss")
+    res = unixtime
+      .toTimes()
+      .toSlackPost("`" & unixtime.intToStr & "` は変換するとこうなるよ。", "#3f93f2")
 
-  return SlackPayload(attachments: @[SlackPost(
-    pretext:
-    "`" & time.intToStr & "` は変換するとこうなるよ。",
-    text:
-    "JST: " & jst & "\n" &
-    "UTC: " & utc,
-    color: "#3f93f2",
-  )])
+  return SlackPayload(attachments: @[res])
 
 proc translationDatetime(self: TimeUsecase, date, time: string): SlackPayload =
   let
-    datetime = parse(date & time,
-        "yyyy-MM-ddHH:mm:ss").toTime
+    jst = (date & time)
+      .toTimes("JST")
+      .toSlackPost("`" & date & " " & time & " (JST)` は変換するとこうなるよ。", "#3f93f2")
+    utc = (date & time)
+      .toTimes("UTC")
+      .toSlackPost("`" & date & " " & time & " (UTC)` は変換するとこうなるよ。", "#3f93f2")
 
-  return SlackPayload(attachments: @[SlackPost(
-    pretext:
-    "`" & date & " " & time & " (JST)` は変換するとこうなるよ。",
-    text:
-    "JST: " & datetime.format("yyyy-MM-dd HH:mm:ss") & "\n" &
-    "UTC: " & (datetime - 9.hours).format("yyyy-MM-dd HH:mm:ss") & "\n" &
-    "unixtime: " & $((datetime - 9.hours).toUnix),
-    color: "#3f93f2",
-  ), SlackPost(
-    pretext:
-    "`" & date & " " & time & " (UTC)` は変換するとこうなるよ。",
-    text:
-    "JST: " & (datetime + 9.hours).format("yyyy-MM-dd HH:mm:ss") & "\n" &
-    "UTC: " & datetime.format("yyyy-MM-dd HH:mm:ss") & "\n" &
-    "unixtime: " & $(datetime.toUnix),
-    color: "#3f93f2",
-  )])
+  return SlackPayload(attachments: @[jst, utc])
 
-proc translationDatetime(self: TimeUsecase, date, time,
-    location: string): SlackPayload =
-  let inputDatetime = parse(date & time, "yyyy-MM-ddHH:mm:ss").toTime
+proc translationDatetime(self: TimeUsecase, date, time, location: string): SlackPayload =
+  let
+    res = (date & time)
+      .toTimes(location)
+      .toSlackPost("`" & date & " " & time & " (" & location & ")` は変換するとこうなるよ。", "#3f93f2")
 
-  let jstDatetime =
-    if location == "JST":
-      inputDatetime
-    else:
-      inputDatetime + 9.hours
-
-  let utcDatetime =
-    if location == "JST":
-      inputDatetime - 9.hours
-    else:
-      inputDatetime
-
-  return SlackPayload(attachments: @[SlackPost(
-    pretext:
-    "`" & date & " " & time & " (" & location &
-    ")` は変換するとこうなるよ。",
-    text:
-    "JST: " & jstDatetime.format("yyyy-MM-dd HH:mm:ss") & "\n" &
-    "UTC: " & utcDatetime.format("yyyy-MM-dd HH:mm:ss") & "\n" &
-    "unixtime: " & $utcDatetime.toUnix,
-    color: "#3f93f2",
-  )])
+  return SlackPayload(attachments: @[res])
 
 proc translation*(self: TimeUsecase, time: string): SlackPayload =
   let isUnixtime =
