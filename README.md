@@ -2,13 +2,13 @@
 unixtime、UTC、JSTを相互変換するslack向けslash command
 
 ```
-> /time2unix <unixtime>
+> /time2unix unixtime
 JST: 1970-01-01 09:00:00
 UTC: 1970-01-01 00:00:00
 ```
 
 ```
-> /time2unix [unixtime|yyyy-MM-dd HH:mm:ss [JST|UTC]]
+> /time2unix yyyy-MM-dd HH:mm:ss [JST|UTC]
 JST: 1970-01-01 09:00:00
 UTC: 1970-01-01 00:00:00
 unixtime: 0
