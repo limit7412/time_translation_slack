@@ -1,4 +1,6 @@
-# time_translation_slack ![nim-sls](https://github.com/limit7412/time_translation_slack/workflows/nim-sls/badge.svg)
+# time_translation_slack 
+![nim-sls](https://github.com/limit7412/time_translation_slack/workflows/nim-sls/badge.svg)
+
 unixtime、UTC、JSTを相互変換するslack向けslash command
 
 ```
