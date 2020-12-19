@@ -1,14 +1,22 @@
 #!/bin/bash
 
-stg=$1
+stg=${1}
 [ "$stg" = "" ] && stg="dev"
 
-[ -e bootstrap ] && sudo rm bootstrap
+region="ap-northeast-1"
 
-# nimlang/nim nimble build -d:ssl --passL:-static -d:release --opt:size  && \
-sudo docker run --rm -v $(pwd):/src -w /src         \
-nimlang/nim:1.0.6 nimble build -d:ssl            && \
-mv main bootstrap                                && \
-sudo chmod +x bootstrap                          || exit 1
+account=$(aws sts get-caller-identity | jq -r .Account)
 
-sls deploy -s $stg
+aws ecr get-login-password --region $region                                         |
+docker login --username AWS --password-stdin $account.dkr.ecr.$region.amazonaws.com
+
+container="slack_time_translation_$stg"
+target="$account.dkr.ecr.ap-northeast-1.amazonaws.com/$container"
+
+docker build -t $container .
+docker tag $container:latest $target:latest
+docker push $target:latest
+
+digest=$(aws ecr list-images --repository-name $container | jq '.imageIds[] | select(.imageTag=="latest") | .imageDigest' | tr -d '"')
+
+sls deploy --account $account --stage $stg --digest $digest

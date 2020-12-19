@@ -2,8 +2,7 @@ import os
 import httpClient
 import json
 
-proc hander*(name: string, callback: proc(
-    e: JsonNode): JsonNode) =
+proc hander*(name: string, callback: proc(e: JsonNode): JsonNode) =
   if name != os.getEnv("_HANDLER").string:
     return
 
