@@ -16,7 +16,7 @@ provider:
 
 functions:
   command:
-    image: ${opt:account, self:custom.defaultAccount}.dkr.ecr.${self:provider.region}.amazonaws.com/slack_time_translation_${self:provider.stage}@${opt:digest, self:custom.defaultDigest}
+    handler: command
     events:
       - http:
           path: command
