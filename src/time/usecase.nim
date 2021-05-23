@@ -2,21 +2,21 @@ import os
 import strutils
 import times
 
-import models
-import repository
+import ../time/models as time
+import ../slack/models as slack
 
 type
   TimeUsecase* = ref object
 
-proc translationUnixtime(self: TimeUsecase, unixtime: int): SlackPayload =
+proc translationUnixtime(self: TimeUsecase, unixtime: int): slack.Payload =
   let
     res = unixtime
       .toTimes()
       .toSlackPost("`" & unixtime.intToStr & "` は変換するとこうなるよ。", "#3f93f2")
 
-  return SlackPayload(attachments: @[res])
+  return slack.Payload(attachments: @[res])
 
-proc translationDatetime(self: TimeUsecase, date, time: string): SlackPayload =
+proc translationDatetime(self: TimeUsecase, date, time: string): slack.Payload =
   let
     jst = (date & time)
       .toTimes("JST")
@@ -25,17 +25,17 @@ proc translationDatetime(self: TimeUsecase, date, time: string): SlackPayload =
       .toTimes("UTC")
       .toSlackPost("`" & date & " " & time & " (UTC)` は変換するとこうなるよ。", "#3f93f2")
 
-  return SlackPayload(attachments: @[jst, utc])
+  return slack.Payload(attachments: @[jst, utc])
 
-proc translationDatetime(self: TimeUsecase, date, time, location: string): SlackPayload =
+proc translationDatetime(self: TimeUsecase, date, time, location: string): slack.Payload =
   let
     res = (date & time)
       .toTimes(location)
       .toSlackPost("`" & date & " " & time & " (" & location & ")` は変換するとこうなるよ。", "#3f93f2")
 
-  return SlackPayload(attachments: @[res])
+  return slack.Payload(attachments: @[res])
 
-proc translation*(self: TimeUsecase, slashCommand: SlashCommand): SlackPayload =
+proc translation*(self: TimeUsecase, slashCommand: slack.SlashCommand): slack.Payload =
   let isUnixtime =
     try:
       discard slashCommand.text[0].parseInt
@@ -53,7 +53,7 @@ proc translation*(self: TimeUsecase, slashCommand: SlashCommand): SlackPayload =
     try:
       discard (date & " " & time).parse("yyyy-MM-dd HH:mm:ss")
     except:
-      return SlackPayload(attachments: @[SlackPost(
+      return slack.Payload(attachments: @[slack.Post(
         pretext: "日時の書式が間違ってるみたい…よく確認してみて。",
         text: "/time2unix [unixtime|yyyy-MM-dd HH:mm:ss [JST|UTC]]",
         color: "#ffca4f",
@@ -65,22 +65,8 @@ proc translation*(self: TimeUsecase, slashCommand: SlashCommand): SlackPayload =
     of 3:
       self.translationDatetime(date, time, slashCommand.text[2])
     else:
-      SlackPayload(attachments: @[SlackPost(
+      slack.Payload(attachments: @[slack.Post(
           pretext: "引数の数が間違ってるみたい…よく確認してみて。",
           text: "/time2unix [unixtime|yyyy-MM-dd HH:mm:ss [JST|UTC]]",
           color: "#ffca4f",
         )])
-
-proc err*(self: TimeUsecase, err: ref Exception) =
-  let
-    repo = SlackRepository(url: os.getEnv("ALERT_WEBHOOK_URL").string)
-    message = "エラーみたい…確認してみよっか"
-
-  discard repo.post(@[SlackPost(
-      fallback: message,
-      pretext: "<@" & os.getEnv("SLACK_ID").string & "> " & message,
-      title: err.msg,
-      text: err.getStackTrace,
-      color: "#EB4646",
-      footer: "slack-time-translation",
-    )])

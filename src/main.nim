@@ -1,23 +1,25 @@
-import hander
 import json
 
-import usecase
-import models
+import runtime/lambda
+import slack/models as slack
+import time/usecase as timeUC
+import error/usecase as errUC
 
 when isMainModule:
   "command".hander do (event: JsonNode) -> JsonNode:
     let
-      uc = TimeUsecase()
+      timeUsecase = timeUC.TimeUsecase()
+      errUsecase = errUC.ErrorUsecase()
 
     try:
       let
         slashCommand = ($event["body"])
           .parseSlashCommand()
-        res = uc.translation(slashCommand)
+        res = timeUsecase.translation(slashCommand)
       return %*{
         "statusCode": 200,
         "body": $ %*res,
       }
     except:
-      uc.err(getCurrentException())
+      errUsecase.err(getCurrentException())
       raise
