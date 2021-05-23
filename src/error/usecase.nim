@@ -6,7 +6,7 @@ import  ../slack/repository as slackRepo
 type
   ErrorUsecase* = ref object
 
-proc err*(self: ErrorUsecase, err: ref Exception) =
+proc alert*(self: ErrorUsecase, err: ref Exception) =
   let
     repo = slackRepo.SlackRepository(url: os.getEnv("ALERT_WEBHOOK_URL").string)
     message = "エラーみたい…確認してみよっか"
