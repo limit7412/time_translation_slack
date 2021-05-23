@@ -21,5 +21,5 @@ when isMainModule:
         "body": $ %*res,
       }
     except:
-      errUsecase.err(getCurrentException())
+      errUsecase.alert(getCurrentException())
       raise
