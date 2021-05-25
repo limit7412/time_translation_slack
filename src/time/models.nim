@@ -56,8 +56,8 @@ proc toTimes*(time, timezone: string): Times =
 
   return self
 
-proc toSlackPost*(self: Times, pretext, color: string): slack.Post =
-  return slack.Post(
+proc toSlackAttachment*(self: Times, pretext, color: string): slack.Attachment =
+  return slack.Attachment(
     pretext: pretext,
     text:
     "JST: " & self.jstDate & "\n" &

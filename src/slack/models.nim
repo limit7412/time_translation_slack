@@ -3,7 +3,7 @@ import tables
 import uri
 
 type
-  Post* = ref object
+  Attachment* = ref object
     fallback*: string
     pretext*: string
     title*: string
@@ -11,8 +11,8 @@ type
     color*: string
     footer*: string
 
-  Payload* = ref object
-    attachments*: seq[Post]
+  Post* = ref object
+    attachments*: seq[Attachment]
 
   SlashCommand* = ref object
     input*: string
