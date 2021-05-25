@@ -11,7 +11,7 @@ proc alert*(self: ErrorUsecase, err: ref Exception) =
     repo = slackRepo.SlackRepository(url: os.getEnv("ALERT_WEBHOOK_URL").string)
     message = "エラーみたい…確認してみよっか"
 
-  discard repo.sendPost(@[slack.Post(
+  discard repo.sendAttachments(@[slack.Attachment(
       fallback: message,
       pretext: "<@" & os.getEnv("SLACK_ID").string & "> " & message,
       title: err.msg,
