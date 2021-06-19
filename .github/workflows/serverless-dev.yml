@@ -1,8 +1,6 @@
-name: nim-sls
+name: serverless-dev
 
-on:
-  push:
-    branches: [ master ]
+on: pull_request
 
 jobs:
   deploy:
@@ -28,7 +26,7 @@ jobs:
 
     - name: get env
       run: |
-        aws s3 cp s3://limit7412-workflow-env/slack-time-translation/prod/env.yml .
+        aws s3 cp s3://limit7412-workflow-env/slack-time-translation/dev/env.yml .
 
     - name: build
       env:
@@ -39,8 +37,8 @@ jobs:
         docker cp $REPOSITORY:/work/bootstrap .
 
     - name: deploy
-      run: sls deploy --stage prod > ./result.txt
+      run: sls deploy --stage dev > ./result.txt
 
     - name: push result
       run: |
-        aws s3 cp ./result.txt s3://limit7412-workflow-env/slack-time-translation/result/result-prod.txt
+        aws s3 cp ./result.txt s3://limit7412-workflow-env/slack-time-translation/result/result-dev.txt
