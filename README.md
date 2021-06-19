@@ -1,5 +1,5 @@
-# time_translation_slack 
-![nim-sls](https://github.com/limit7412/time_translation_slack/workflows/nim-sls/badge.svg)
+# time_translation_slack
+[![serverless](https://github.com/limit7412/time_translation_slack/actions/workflows/serverless-prod.yml/badge.svg?branch=master)](https://github.com/limit7412/time_translation_slack/actions/workflows/serverless-prod.yml)
 
 unixtime、UTC、JSTを相互変換するslack向けslash command
 
