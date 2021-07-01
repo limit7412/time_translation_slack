@@ -7,7 +7,7 @@ license       = "MIT"
 srcDir        = "src"
 bin           = @["main"]
 
-backend       = "c"
+backend       = "cpp"
 
 # Dependencies
 
