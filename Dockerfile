@@ -3,7 +3,7 @@ FROM nimlang/nim:latest as build-image
 WORKDIR /work
 COPY ./ ./
 
-RUN nimble build --app:staticlib -d:release
+RUN nimble build --app:staticlib -d:release --gc:arc
 RUN mv main bootstrap
 RUN chmod +x bootstrap
 
