@@ -7,7 +7,10 @@ jobs:
     name: deploy
     runs-on: ubuntu-latest
     steps:
-
+    - name: add-mask
+      run: |
+        echo "::add-mask::${{ secrets.API_URL_MASK_DEV }}"
+        
     - name: setup node.js
       uses: actions/setup-node@v1
 
@@ -29,8 +32,4 @@ jobs:
         aws s3 cp s3://limit7412-workflow-env/slack-time-translation/dev/env.yml .
 
     - name: deploy
-      run: sls deploy --stage dev > ./result.txt
-
-    - name: push result
-      run: |
-        aws s3 cp ./result.txt s3://limit7412-workflow-env/slack-time-translation/result/result-dev.txt
+      run: sls deploy --stage dev
