@@ -7,7 +7,7 @@ RUN nimble build --passL:-static -d:release --gc:orc
 RUN mv main bootstrap
 RUN chmod +x bootstrap
 
-FROM public.ecr.aws/lambda/provided:al2
+FROM public.ecr.aws/lambda/provided:latest
 
 COPY --from=build-image /work/bootstrap /var/runtime/
 
