@@ -1,5 +1,3 @@
-org: qazx7412
-app: slack-time-translation
 service: slack-time-translation
 
 custom:
